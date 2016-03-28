@@ -1,0 +1,92 @@
+<html>
+    <head>
+        <title>jobs</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+
+        <script src="/assets/js/jq.min.js"></script>
+        <script src="/assets/js/bootstrap.min.js"></script>
+
+        <style>
+            .job-list {
+                margin: 30px auto;
+                width: 700px;
+            }
+            .company-info, .company-info:hover, .company-info:active {
+                color: white;
+                padding-right: 30px;
+            }
+
+            #panel {
+                background-color: white;
+                max-height: 80%;
+                overflow-y: auto;
+                top: 10px;
+                right: 10px;
+                width: 250px;
+                border: solid 1px silver;
+            }
+        </style>
+
+        <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key={{.key}}&plugin=AMap.Transfer"></script>
+    </head>
+
+    <body>
+        <div class="container">
+            {{range .jobs}}
+                <div class="job-list list-group">
+                    <li class="list-group-item active">
+                        <a class="company-info" href="{{.CompanyUrl}}">{{.CompanyName}}</a>
+                        <a class="lagou company-info" href="{{.LagouURL}}">{{.JobName}}</a>
+                        {{.JobUpTime}}
+                    </li>
+                    
+                    <li class="list-group-item list-group-item-info">公司相关：</li>
+                    <li class="list-group-item">领域：{{.CompanyArea}}</li>
+                    <li class="list-group-item">规模：{{.CompanySize}}</li>
+                    <li class="list-group-item">融资：{{.CompanyStage}}</li>
+                    <li class="address list-group-item">地址：{{.CompanyAddress}}</li>
+
+                    <li class="list-group-item list-group-item-info">职位相关：</li>
+                    <li class="list-group-item">薪酬：{{.JobSalary}}</li>
+                    <li class="list-group-item">工作经验：{{.JobExp}}</li>
+                    <li class="list-group-item">学历：{{.JobDegree}}</li>
+                    <li class="list-group-item">{{.JobDesc}}</li>
+
+                    <li class="list-group-item list-group-item-info">HR相关：</li>
+                    <li class="list-group-item">HR姓名：{{.HrName}}</li>
+                    <li class="list-group-item">投递后7天内处理完成的简历所占比例：{{.HrPercent}}</li>
+                    <li class="list-group-item">完成简历处理的平均用时：{{.HrExecTime}}</li>
+
+                    <li class="list-group-item list-group-item-info">地图：</li>
+                    <li class="list-group-item"><div class="panel"></div></li>
+                </div>
+            {{end}}
+        </div>
+
+        <script type="text/javascript">
+            // 初始化地图panel的id
+            $(".lagou").each(function(index) {
+                id = $(this).attr("href").match(/\d+/)[0];
+                $(this).parent().parent().find(".panel").attr("id", id);
+
+                address = $(this).parent().parent().find(".address").text()
+
+                // 发起高德地图请求
+                var transOptions = {
+                    city: '北京市',
+                    panel: id,
+                    policy: AMap.TransferPolicy.LEAST_TIME //乘车策略
+                };
+                //构造公交换乘类
+                var transfer = new AMap.Transfer(transOptions);
+                //根据起、终点名称查询公交换乘路线
+                transfer.search([{
+                    keyword: '北苑(地铁站)'
+                }, {
+                    keyword: address
+                }]);
+            });
+        </script>
+    </body>
+</html>
